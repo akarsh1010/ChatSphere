@@ -69,17 +69,18 @@ public class FileManager {
                 if (line.isEmpty()) {
                     continue;
                 }
-                String[] parts = line.split(",", 3);
-                if (parts.length == 3) {
+                String[] parts = line.split(",", 4);
+                if (parts.length >= 3) {
                     String senderName = parts[0];
                     String receiverName = parts[1];
                     String content = parts[2];
+                    String timestamp = parts.length >= 4 ? parts[3] : "";
 
                     User sender = findUser(users, senderName);
                     User receiver = findUser(users, receiverName);
 
                     if (sender != null && receiver != null) {
-                        messages.add(new Message(sender, receiver, content));
+                        messages.add(new Message(sender, receiver, content, timestamp));
                     }
                 }
             }
@@ -93,7 +94,8 @@ public class FileManager {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(MESSAGES_FILE, true))) {
             writer.write(message.getSender().getUserName() + ","
                     + message.getReceiver().getUserName() + ","
-                    + message.getMessage());
+                    + message.getMessage() + ","
+                    + message.getTimestamp());
             writer.newLine();
         } catch (IOException e) {
             System.out.println("-> Error saving message to file: " + e.getMessage());
