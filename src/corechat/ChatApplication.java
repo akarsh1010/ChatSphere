@@ -11,10 +11,14 @@ public class ChatApplication {
     static Scanner scanner = new Scanner(System.in);
 
 
-    ArrayList<User> users = new ArrayList<>();
+    ArrayList<User> users = FileManager.loadUsers();
     User currentUser = null;
     MessageManager manager = new MessageManager();
     ChatService chatService;
+
+    public ChatApplication() {
+        manager.setMessages(FileManager.loadMessages(users));
+    }
 
 
     public static void main(String[] args) {
@@ -96,10 +100,21 @@ public class ChatApplication {
 
     public void registerUser() {
         System.out.print("Enter Username : ");
-        String name = scanner.nextLine().toLowerCase();
+        String name = scanner.nextLine().trim().toLowerCase();
 
-        User user = new User(name);
+        for (User u : users) {
+            if (u.getUserName().equalsIgnoreCase(name)) {
+                System.out.println("\n-> Username already exists! Please choose another one.\n");
+                return;
+            }
+        }
+
+        System.out.print("Enter password : ");
+        String password = scanner.nextLine();
+
+        User user = new User(name, password);
         users.add(user);
+        FileManager.saveUser(user);
 
         System.out.println("registration completed !! ");
         System.out.println("\nHello : " + user.getUserName() + "\n");
@@ -108,22 +123,25 @@ public class ChatApplication {
 
 
     public boolean userLogin() {
-        String name;
-
         System.out.print("Enter user name : ");
-        name = scanner.nextLine().toLowerCase();
+        String name = scanner.nextLine().trim().toLowerCase();
 
+        System.out.print("Enter password : ");
+        String password = scanner.nextLine();
 
         // User register or not logic
-
         for (int i = 0; i < users.size(); i++) {
-            if (name.equals(users.get(i).getUserName())) {
+            User user = users.get(i);
+            if (name.equalsIgnoreCase(user.getUserName())) {
+                if (user.getPassword() != null && !user.getPassword().isEmpty() && !user.getPassword().equals(password)) {
+                    System.out.println("\n-> Incorrect password !!\n");
+                    return false;
+                }
                 System.out.println("\nLogin Successfully \n");
-                currentUser = users.get(i);
-                System.out.println("Welcome , " + currentUser.getUserName());
+                currentUser = user;
+                System.out.println("Welcome , " + currentUser.getUserName() + "\n");
                 return true;
             }
-
         }
         System.out.println("\nPlease Register first !!");
         System.out.println();

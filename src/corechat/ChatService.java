@@ -29,7 +29,7 @@ public class ChatService {
         int count = 1;
         for (int i = 0; i < users.size(); i++) {
 
-            if (users.get(i)== currentUser) {
+            if (users.get(i).equals(currentUser)) {
                 continue;
             }
             System.out.println(count + "." + users.get(i).getUserName());
@@ -58,7 +58,7 @@ public class ChatService {
         User selectedUser = null;
 
         for (int i = 0; i < users.size(); i++) {
-            if (users.get(i) == currentUser) {
+            if (users.get(i).equals(currentUser)) {
                 continue;
             }
             if (count == choice) {
@@ -69,32 +69,47 @@ public class ChatService {
         }
 
         if (selectedUser != null) {
-            for (int i = 0; i < messageManager.getMessages().size(); i++) {
+            System.out.println("========================================");
+            System.out.println(" Chatting with @" + selectedUser.getUserName());
+            System.out.println(" (Type 'exit' or 'back' to leave chat)  ");
+            System.out.println("========================================");
 
+            // Display previous chat history
+            for (int i = 0; i < messageManager.getMessages().size(); i++) {
                 Message message = messageManager.getMessages().get(i);
 
                 if (
-                        (message.getSender() == currentUser
-                                && message.getReceiver() == selectedUser)
+                        (message.getSender().getUserName().equalsIgnoreCase(currentUser.getUserName())
+                                && message.getReceiver().getUserName().equalsIgnoreCase(selectedUser.getUserName()))
                                 ||
-                                (message.getSender() == selectedUser
-                                        && message.getReceiver() == currentUser)
+                                (message.getSender().getUserName().equalsIgnoreCase(selectedUser.getUserName())
+                                        && message.getReceiver().getUserName().equalsIgnoreCase(currentUser.getUserName()))
                 ) {
-
                     System.out.println(
                             message.getSender().getUserName() + " : " + message.getMessage());
                 }
             }
+            System.out.println("----------------------------------------");
 
+            // Continuous chat loop
+            while (true) {
+                System.out.print(currentUser.getUserName() + " > ");
+                String messageText = scanner.nextLine().trim();
 
-            System.out.print("\nEnter message : ");
-            String messageText = scanner.nextLine();
-            System.out.println();
+                if (messageText.equalsIgnoreCase("exit") || messageText.equalsIgnoreCase("back")) {
+                    System.out.println("\nLeft chat with @" + selectedUser.getUserName() + ".\n");
+                    break;
+                }
 
-            Message message = new Message(currentUser, selectedUser, messageText);
-            messageManager.storeMessages(message);
+                if (messageText.isEmpty()) {
+                    continue;
+                }
 
-            System.out.println("Message sent successfully ! \n");
+                Message message = new Message(currentUser, selectedUser, messageText);
+                messageManager.storeMessages(message);
+                FileManager.saveMessage(message);
+            }
+
         } else {
             System.out.println("Invalid user choice !!");
         }

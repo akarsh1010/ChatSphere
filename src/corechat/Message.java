@@ -6,7 +6,7 @@ public class Message {
     private User receiver;
     private String messageContent;
 
-    Message(User sender , User receiver , String messageContent){
+    public Message(User sender, User receiver, String messageContent) {
         this.sender = sender;
         this.receiver = receiver;
         this.messageContent = messageContent;
