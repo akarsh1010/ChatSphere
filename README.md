@@ -48,19 +48,25 @@ CoreChat/
 │   └── messages.txt             # Persisted messages (sender,receiver,content)
 ├── src/
 │   └── corechat/
-│       ├── ChatApplication.java # Entry point, CLI menu router, and authentication
-│       ├── ChatService.java     # User listing, continuous chat session loop
+│       ├── ChatApplication.java # Console edition entry point (CLI router & menus)
+│       ├── ChatWebServer.java   # 🌐 Web edition server (built-in Java HttpServer & REST APIs)
+│       ├── ChatService.java     # Console continuous chat session loop
 │       ├── FileManager.java     # File I/O persistence manager (read/write operations)
 │       ├── MessageManager.java  # In-memory message management & aggregation
 │       ├── Message.java         # Domain entity representing a single chat message
 │       └── User.java            # Domain entity representing an authenticated user
+├── web/                         # 🌐 Frontend web assets
+│   ├── index.html               # Modern responsive web layout (Login/Register & Chat views)
+│   ├── style.css                # Dark-mode styling, responsive bubbles, custom scrollbars
+│   └── app.js                   # Vanilla JS client (Fetch API, live auto-polling)
 ├── README.md
 └── CoreChat.iml
 ```
 
 ### Class Responsibilities:
-- **`ChatApplication`**: Coordinates startup, loads stored state, renders main menus, and manages user login/registration.
-- **`ChatService`**: Orchestrates active chat sessions, displays message history, and drives the continuous messaging loop.
+- **`ChatWebServer`**: Zero-dependency Web Server serving the frontend assets and REST APIs (`/api/login`, `/api/register`, `/api/users`, `/api/messages`, `/api/send`).
+- **`ChatApplication`**: Console/CLI entry point coordinating terminal menus and user interactions.
+- **`ChatService`**: Orchestrates active console chat sessions and drives the continuous messaging loop.
 - **`FileManager`**: Decoupled persistence layer handling serialization and parsing of data files.
 - **`MessageManager`**: Acts as an in-memory repository managing the active message list.
 - **`User` & `Message`**: Encapsulated domain models with appropriate accessors and equality contracts.
@@ -77,7 +83,7 @@ CoreChat/
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/your-username/CoreChat.git
+   git clone https://github.com/alok0770/ChatSphere.git
    cd CoreChat
    ```
 
@@ -86,12 +92,20 @@ CoreChat/
    javac -d out/production/CoreChat src/corechat/*.java
    ```
 
-3. **Run the application:**
-   ```bash
-   java -cp out/production/CoreChat corechat.ChatApplication
-   ```
+3. **Run the Application:**
 
-*(Alternatively, open the project in **IntelliJ IDEA** and click **Run** on `ChatApplication.java`.)*
+   - **Option A — Web Edition (Browser):**
+     ```bash
+     java -cp out/production/CoreChat corechat.ChatWebServer
+     ```
+     👉 Then open `http://localhost:8080` in your web browser!
+
+   - **Option B — Console Edition (Terminal):**
+     ```bash
+     java -cp out/production/CoreChat corechat.ChatApplication
+     ```
+
+*(Alternatively, open the project in **IntelliJ IDEA** and right-click **Run** on either `ChatWebServer.java` or `ChatApplication.java`.)*
 
 ---
 
@@ -131,12 +145,22 @@ Left chat with @rahul.
 
 ---
 
-## 🗺️ Roadmap (Upcoming Features for v2.0)
+## 🗺️ Roadmap & Changelog
 
-- [ ] **Message Timestamps**: Show date and time alongside messages (`[10:45 AM] user > msg`).
-- [ ] **Password Hashing**: Secure storage using SHA-256 instead of plain text.
-- [ ] **Socket Programming**: Multi-client networking for real-time chatting across multiple machines.
-- [ ] **Group Chats**: Ability to create rooms and chat with multiple users simultaneously.
+- [x] **Message Timestamps**: Accurate time logging (`11:45 PM`) stored in `messages.txt`.
+- [x] **Web Edition UI**: Full-stack modern responsive web messenger with live polling.
+- [x] **Zero-Dependency HTTP Server**: Built-in Java SE `HttpServer` with REST APIs.
+- [x] **Cloud Containerization**: 1-click Dockerfile for instant deployment on Render.
+- [ ] **Socket Programming**: WebSockets for push-based real-time communication.
+- [ ] **Group Chats**: Multi-user rooms and channel broadcasting.
+
+---
+
+## 👨‍💻 Author
+
+**Alok Rana**
+- **GitHub:** [@alok0770](https://github.com/alok0770)
+- **Email:** [alokrana0770@gmail.com](mailto:alokrana0770@gmail.com)
 
 ---
 
