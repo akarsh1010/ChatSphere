@@ -193,6 +193,9 @@ function logout() {
     activeChatUser = null;
     allUsers = [];
 
+    const frame = document.querySelector('.app-frame');
+    if (frame) frame.classList.remove('in-chat');
+
     document.getElementById('admin-panel-btn').classList.add('hidden');
     document.getElementById('admin-modal').classList.add('hidden');
 
@@ -267,6 +270,9 @@ function filterUsers() {
 function selectUser(username) {
     activeChatUser = username;
 
+    const frame = document.querySelector('.app-frame');
+    if (frame) frame.classList.add('in-chat');
+
     document.getElementById('no-chat-selected').classList.add('hidden');
     document.getElementById('active-chat-wrapper').classList.remove('hidden');
 
@@ -287,6 +293,23 @@ function selectUser(username) {
     messagePollingTimer = setInterval(loadMessages, 1500);
 
     document.getElementById('message-input').focus();
+}
+
+function backToSidebar() {
+    const frame = document.querySelector('.app-frame');
+    if (frame) frame.classList.remove('in-chat');
+
+    activeChatUser = null;
+    const noChat = document.getElementById('no-chat-selected');
+    const activeChat = document.getElementById('active-chat-wrapper');
+    if (noChat) noChat.classList.remove('hidden');
+    if (activeChat) activeChat.classList.add('hidden');
+
+    if (messagePollingTimer) {
+        clearInterval(messagePollingTimer);
+        messagePollingTimer = null;
+    }
+    renderUsersList(allUsers);
 }
 
 let lastRenderedMessagesCount = -1;

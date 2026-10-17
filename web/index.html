@@ -174,14 +174,21 @@
                 <div id="active-chat-wrapper" class="active-chat-wrapper hidden">
                     <!-- Header -->
                     <header class="chat-header-bar">
-                        <div class="chat-partner-info">
-                            <div class="avatar-sm-wrap">
-                                <div class="avatar" id="active-chat-avatar">?</div>
-                                <span class="active-pulse"></span>
-                            </div>
-                            <div>
-                                <h3 id="active-chat-username">@username</h3>
-                                <span class="chat-status-text">⚡ Direct Session · End-to-End Persisted</span>
+                        <div class="chat-header-left">
+                            <button class="mobile-back-btn" onclick="backToSidebar()" title="Back to conversations">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                                </svg>
+                            </button>
+                            <div class="chat-partner-info">
+                                <div class="avatar-sm-wrap">
+                                    <div class="avatar" id="active-chat-avatar">?</div>
+                                    <span class="active-pulse"></span>
+                                </div>
+                                <div>
+                                    <h3 id="active-chat-username">@username</h3>
+                                    <span class="chat-status-text">⚡ Direct Session · End-to-End Persisted</span>
+                                </div>
                             </div>
                         </div>
 

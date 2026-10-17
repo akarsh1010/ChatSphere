@@ -643,6 +643,32 @@ body {
     align-items: center;
 }
 
+.chat-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.mobile-back-btn {
+    display: none;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-glass-subtle);
+    color: var(--text-white);
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.mobile-back-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
 .chat-partner-info {
     display: flex;
     align-items: center;
@@ -1084,4 +1110,176 @@ body {
 .btn-admin-act.btn-warn:hover {
     background: rgba(245, 158, 11, 0.3);
     color: white;
+}
+
+/* =========================================
+   MOBILE RESPONSIVE ADAPTATIONS (MAX 768px)
+   ========================================= */
+@media (max-width: 768px) {
+    html, body {
+        overflow-x: hidden;
+        width: 100%;
+        height: 100%;
+    }
+
+    /* Ambient glow elements scaled down on mobile */
+    .ambient-glow {
+        filter: blur(80px);
+        opacity: 0.15;
+    }
+
+    /* Auth screen responsive sizing */
+    .auth-wrapper {
+        width: 100%;
+        max-width: 100%;
+        padding: 16px 14px;
+    }
+
+    .auth-card {
+        padding: 24px 18px;
+        border-radius: 20px;
+    }
+
+    .brand-logo-glow {
+        width: 46px;
+        height: 46px;
+        margin-bottom: 12px;
+    }
+
+    .auth-header h2 {
+        font-size: 20px;
+    }
+
+    .auth-header p {
+        font-size: 12px;
+    }
+
+    .dev-credit-box {
+        padding: 12px 14px;
+    }
+
+    .dev-avatar-ring {
+        width: 38px;
+        height: 38px;
+        font-size: 13px;
+    }
+
+    .dev-meta-info h4 {
+        font-size: 13px;
+    }
+
+    /* Main chat frame: full screen viewport */
+    .app-frame {
+        width: 100vw;
+        height: 100dvh;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Default mobile state: Full-screen sidebar (Friends list) */
+    .sidebar-modern {
+        width: 100vw;
+        flex: 1;
+        height: 100%;
+        border-right: none;
+        display: flex;
+    }
+
+    .chat-viewport-modern {
+        display: none;
+        width: 100vw;
+        height: 100%;
+    }
+
+    /* When user taps a friend: Switch to full-screen chat viewport */
+    .app-frame.in-chat .sidebar-modern {
+        display: none !important;
+    }
+
+    .app-frame.in-chat .chat-viewport-modern {
+        display: flex !important;
+        width: 100vw;
+        height: 100%;
+    }
+
+    /* Mobile back arrow button is visible in chat */
+    .mobile-back-btn {
+        display: flex;
+    }
+
+    /* Chat header bar adjustments */
+    .chat-header-bar {
+        padding: 10px 14px;
+    }
+
+    .chat-partner-info h3 {
+        font-size: 15px;
+    }
+
+    .chat-status-text {
+        font-size: 10px;
+    }
+
+    .sound-toggle-pill span {
+        display: none; /* Hide text, keep bell icon on mobile */
+    }
+
+    .sound-toggle-pill {
+        padding: 6px 10px;
+        font-size: 13px;
+    }
+
+    /* Messages flow & input dock */
+    .messages-flow-canvas {
+        padding: 12px 10px;
+        gap: 8px;
+    }
+
+    .message-bubble {
+        max-width: 86%;
+        padding: 9px 12px;
+        font-size: 13.5px;
+    }
+
+    .chat-input-bar-modern {
+        padding: 8px 10px;
+        gap: 8px;
+    }
+
+    .chat-input-field {
+        font-size: 14px;
+        padding: 10px 14px;
+    }
+
+    .action-send-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+    }
+
+    /* Super Admin Modal mobile responsiveness */
+    .admin-modal-card {
+        max-width: 95vw;
+        padding: 18px 14px;
+        max-height: 88vh;
+        overflow-y: auto;
+        gap: 14px;
+    }
+
+    .admin-stats-row {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .admin-user-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 12px;
+    }
+
+    .admin-actions-cell {
+        width: 100%;
+        justify-content: flex-end;
+    }
 }
