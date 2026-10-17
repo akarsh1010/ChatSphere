@@ -2,6 +2,5 @@ alok,100
 Aman,100
 Gopi,100
 Saurabh,100
-
-alokk,1000
 alokrana,100
+gg,jk
