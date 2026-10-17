@@ -41,6 +41,7 @@ public class ChatWebServer {
         server.createContext("/api/users", new UsersHandler());
         server.createContext("/api/messages", new MessagesHandler());
         server.createContext("/api/send", new SendMessageHandler());
+        server.createContext("/api/admin", new AdminHandler());
 
         // Static Frontend Files Context (HTML, CSS, JS)
         server.createContext("/", new StaticFileHandler());
@@ -278,6 +279,102 @@ public class ChatWebServer {
             FileManager.saveMessage(message);
 
             sendJsonResponse(exchange, 200, "{\"success\":true}");
+        }
+    }
+
+    // ==============================================================
+    // 7. Admin Moderation Handler (User Management & Moderation)
+    // ==============================================================
+    static class AdminHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            String path = exchange.getRequestURI().getPath();
+            Map<String, String> query = parseQuery(exchange.getRequestURI());
+
+            // 1. Check Admin Status: /api/admin/check?user=...
+            if (path.endsWith("/check")) {
+                String user = query.getOrDefault("user", "");
+                boolean isAdmin = AdminService.isAdmin(user);
+                sendJsonResponse(exchange, 200, "{\"isAdmin\":" + isAdmin + "}");
+                return;
+            }
+
+            // 2. Admin Dashboard Stats & User list: /api/admin/stats?admin=...
+            if (path.endsWith("/stats")) {
+                String admin = query.getOrDefault("admin", "");
+                if (!AdminService.isAdmin(admin)) {
+                    sendJsonResponse(exchange, 403, "{\"success\":false,\"error\":\"Unauthorized\"}");
+                    return;
+                }
+
+                int totalUsers = AdminService.getTotalUsers();
+                int totalMessages = AdminService.getTotalMessages();
+                ArrayList<User> users = FileManager.loadUsers();
+
+                StringBuilder sb = new StringBuilder("{");
+                sb.append("\"success\":true,");
+                sb.append("\"totalUsers\":").append(totalUsers).append(",");
+                sb.append("\"totalMessages\":").append(totalMessages).append(",");
+                sb.append("\"users\":[");
+                for (int i = 0; i < users.size(); i++) {
+                    User u = users.get(i);
+                    sb.append("{\"username\":\"").append(escapeJson(u.getUserName())).append("\",");
+                    sb.append("\"password\":\"").append(escapeJson(u.getPassword())).append("\"}");
+                    if (i < users.size() - 1) sb.append(",");
+                }
+                sb.append("]}");
+                sendJsonResponse(exchange, 200, sb.toString());
+                return;
+            }
+
+            // 3. Delete User: POST /api/admin/delete-user
+            if (path.endsWith("/delete-user") && exchange.getRequestMethod().equalsIgnoreCase("POST")) {
+                String body = readBody(exchange);
+                String admin = extractJsonField(body, "admin");
+                String target = extractJsonField(body, "target");
+
+                boolean deleted = AdminService.deleteUser(admin, target);
+                if (deleted) {
+                    sendJsonResponse(exchange, 200, "{\"success\":true,\"message\":\"User @" + escapeJson(target) + " removed successfully\"}");
+                } else {
+                    sendJsonResponse(exchange, 400, "{\"success\":false,\"error\":\"Cannot delete user or unauthorized\"}");
+                }
+                return;
+            }
+
+            // 4. Clear Chat: POST /api/admin/clear-chat
+            if (path.endsWith("/clear-chat") && exchange.getRequestMethod().equalsIgnoreCase("POST")) {
+                String body = readBody(exchange);
+                String admin = extractJsonField(body, "admin");
+                String user1 = extractJsonField(body, "user1");
+                String user2 = extractJsonField(body, "user2");
+
+                boolean cleared = AdminService.clearConversation(admin, user1, user2);
+                if (cleared) {
+                    sendJsonResponse(exchange, 200, "{\"success\":true,\"message\":\"Conversation wiped successfully\"}");
+                } else {
+                    sendJsonResponse(exchange, 403, "{\"success\":false,\"error\":\"Unauthorized\"}");
+                }
+                return;
+            }
+
+            // 5. Send Warning: POST /api/admin/warning
+            if (path.endsWith("/warning") && exchange.getRequestMethod().equalsIgnoreCase("POST")) {
+                String body = readBody(exchange);
+                String admin = extractJsonField(body, "admin");
+                String target = extractJsonField(body, "target");
+                String warning = extractJsonField(body, "warning");
+
+                boolean sent = AdminService.sendAdminWarning(admin, target, warning);
+                if (sent) {
+                    sendJsonResponse(exchange, 200, "{\"success\":true,\"message\":\"Warning dispatched to @" + escapeJson(target) + "\"}");
+                } else {
+                    sendJsonResponse(exchange, 400, "{\"success\":false,\"error\":\"Failed to send warning\"}");
+                }
+                return;
+            }
+
+            sendJsonResponse(exchange, 404, "{\"error\":\"Not found\"}");
         }
     }
 
