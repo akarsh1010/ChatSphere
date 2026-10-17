@@ -65,7 +65,7 @@ public class AIService {
     }
 
     private static String callGeminiApi(String prompt, String apiKey) throws IOException, InterruptedException {
-        String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + apiKey;
+        String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=" + apiKey;
 
         String safePrompt = prompt.replace("\\", "\\\\")
                 .replace("\"", "\\\"")
@@ -74,13 +74,13 @@ public class AIService {
 
         String jsonPayload = "{\"contents\":[{\"parts\":[{\"text\":\""
                 + "You are SphereAI, the intelligent assistant inside ChatSphere (a chat app built by Alok Rana using Core Java). "
-                + "Keep answers concise, direct, helpful, and formatted for chat bubbles. User question: "
+                + "Keep answers clear, helpful, well-formatted, and concise for chat bubbles. User question: "
                 + safePrompt + "\"}]}]}";
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .header("Content-Type", "application/json")
-                .timeout(Duration.ofSeconds(12))
+                .timeout(Duration.ofSeconds(15))
                 .POST(HttpRequest.BodyPublishers.ofString(jsonPayload, StandardCharsets.UTF_8))
                 .build();
 
@@ -88,22 +88,55 @@ public class AIService {
 
         if (response.statusCode() == 200) {
             String body = response.body();
-            int textIdx = body.indexOf("\"text\": \"");
-            if (textIdx != -1) {
-                int start = textIdx + 9;
-                int end = body.indexOf("\"", start);
-                while (end != -1 && body.charAt(end - 1) == '\\') {
-                    end = body.indexOf("\"", end + 1);
+            return extractTextFromJson(body);
+        }
+        return null;
+    }
+
+    private static String extractTextFromJson(String body) {
+        int textIdx = body.indexOf("\"text\":");
+        if (textIdx == -1) textIdx = body.indexOf("\"text\" :");
+        if (textIdx == -1) return null;
+
+        int firstQuote = body.indexOf("\"", textIdx + 6);
+        if (firstQuote == -1) return null;
+
+        int start = firstQuote + 1;
+        StringBuilder sb = new StringBuilder();
+        boolean escaped = false;
+
+        for (int i = start; i < body.length(); i++) {
+            char c = body.charAt(i);
+            if (escaped) {
+                if (c == 'n') sb.append('\n');
+                else if (c == 't') sb.append('\t');
+                else if (c == 'r') {}
+                else if (c == '"') sb.append('"');
+                else if (c == '\\') sb.append('\\');
+                else if (c == 'u' && i + 4 < body.length()) {
+                    String hex = body.substring(i + 1, i + 5);
+                    try {
+                        int code = Integer.parseInt(hex, 16);
+                        sb.append((char) code);
+                        i += 4;
+                    } catch (NumberFormatException e) {
+                        sb.append(c);
+                    }
+                } else {
+                    sb.append(c);
                 }
-                if (end != -1) {
-                    String rawText = body.substring(start, end);
-                    return rawText.replace("\\n", "\n")
-                            .replace("\\\"", "\"")
-                            .replace("\\\\", "\\");
+                escaped = false;
+            } else {
+                if (c == '\\') {
+                    escaped = true;
+                } else if (c == '"') {
+                    return sb.toString();
+                } else {
+                    sb.append(c);
                 }
             }
         }
-        return null;
+        return sb.toString();
     }
 
     private static String generateLocalSmartReply(String prompt, String username) {
