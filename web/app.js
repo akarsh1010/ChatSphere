@@ -181,6 +181,7 @@ function initChatView() {
     avatarEl.style.background = getAvatarGradient(currentUser);
 
     loadUsers();
+    checkAdminStatus();
 }
 
 function logout() {
@@ -191,6 +192,9 @@ function logout() {
     currentUser = null;
     activeChatUser = null;
     allUsers = [];
+
+    document.getElementById('admin-panel-btn').classList.add('hidden');
+    document.getElementById('admin-modal').classList.add('hidden');
 
     document.getElementById('username').value = '';
     document.getElementById('password').value = '';
@@ -400,4 +404,149 @@ async function handleSendMessage(event) {
     } catch (err) {
         console.error('Error sending message:', err);
     }
+}
+
+// =========================================
+// SUPER ADMIN CONSOLE CONTROLLER
+// =========================================
+async function checkAdminStatus() {
+    if (!currentUser) return;
+    try {
+        const res = await fetch(`/api/admin/check?user=${encodeURIComponent(currentUser)}`);
+        const data = await res.json();
+        if (data.isAdmin) {
+            document.getElementById('admin-panel-btn').classList.remove('hidden');
+            document.getElementById('current-user-name').textContent = '@' + currentUser + ' 👑';
+        } else {
+            document.getElementById('admin-panel-btn').classList.add('hidden');
+        }
+    } catch (err) {
+        console.error('Failed to verify admin status:', err);
+    }
+}
+
+function openAdminModal() {
+    document.getElementById('admin-modal').classList.remove('hidden');
+    loadAdminDashboard();
+}
+
+function closeAdminModal() {
+    document.getElementById('admin-modal').classList.add('hidden');
+    document.getElementById('admin-feedback').classList.add('hidden');
+}
+
+function handleModalBackdropClick(event) {
+    if (event.target.id === 'admin-modal') {
+        closeAdminModal();
+    }
+}
+
+async function loadAdminDashboard() {
+    if (!currentUser) return;
+    try {
+        const res = await fetch(`/api/admin/stats?admin=${encodeURIComponent(currentUser)}`);
+        const data = await res.json();
+
+        if (data.success) {
+            document.getElementById('stat-total-users').textContent = data.totalUsers;
+            document.getElementById('stat-total-messages').textContent = data.totalMessages;
+
+            renderAdminUserRows(data.users || []);
+        }
+    } catch (err) {
+        console.error('Failed to load admin dashboard:', err);
+    }
+}
+
+function renderAdminUserRows(users) {
+    const container = document.getElementById('admin-users-table');
+    container.innerHTML = '';
+
+    if (users.length === 0) {
+        container.innerHTML = '<div style="padding: 16px; text-align: center; color: var(--text-dim); font-size: 13px;">No users found</div>';
+        return;
+    }
+
+    users.forEach(user => {
+        const row = document.createElement('div');
+        row.className = 'admin-user-row';
+
+        const isSuperAdmin = user.username.toLowerCase() === 'alokrana' || user.username.toLowerCase() === 'admin';
+        const initial = user.username.charAt(0).toUpperCase();
+        const gradient = getAvatarGradient(user.username);
+
+        row.innerHTML = `
+            <div class="admin-user-info">
+                <div class="avatar" style="width: 32px; height: 32px; font-size: 12px; background: ${gradient};">${initial}</div>
+                <div>
+                    <span class="admin-user-name">@${user.username} ${isSuperAdmin ? '👑 (Admin)' : ''}</span>
+                </div>
+            </div>
+            <div class="admin-actions-cell">
+                ${!isSuperAdmin ? `
+                    <button class="btn-admin-act btn-warn" onclick="sendWarningByAdmin('${user.username}')" title="Send Official Notice">
+                        ⚠️ Warn
+                    </button>
+                    <button class="btn-admin-act btn-delete" onclick="deleteUserByAdmin('${user.username}')" title="Delete User">
+                        🗑️ Delete
+                    </button>
+                ` : '<span style="font-size: 11px; color: var(--accent-emerald); font-weight: 700;">Protected</span>'}
+            </div>
+        `;
+        container.appendChild(row);
+    });
+}
+
+async function deleteUserByAdmin(targetUsername) {
+    if (!confirm(`Are you sure you want to permanently delete user @${targetUsername} and their chat history?`)) {
+        return;
+    }
+
+    try {
+        const res = await fetch('/api/admin/delete-user', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ admin: currentUser, target: targetUsername })
+        });
+        const data = await res.json();
+
+        showAdminFeedback(data.message || data.error);
+        if (data.success) {
+            loadAdminDashboard();
+            loadUsers();
+            if (activeChatUser === targetUsername) {
+                document.getElementById('no-chat-selected').classList.remove('hidden');
+                document.getElementById('active-chat-wrapper').classList.add('hidden');
+                activeChatUser = null;
+            }
+        }
+    } catch (err) {
+        showAdminFeedback('Failed to delete user.');
+    }
+}
+
+async function sendWarningByAdmin(targetUsername) {
+    const warningText = prompt(`Enter official admin notice for @${targetUsername}:`, 'Please follow community rules and maintain respect.');
+    if (!warningText || !warningText.trim()) return;
+
+    try {
+        const res = await fetch('/api/admin/warning', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ admin: currentUser, target: targetUsername, warning: warningText.trim() })
+        });
+        const data = await res.json();
+        showAdminFeedback(data.message || data.error);
+    } catch (err) {
+        showAdminFeedback('Failed to send warning.');
+    }
+}
+
+function showAdminFeedback(msg) {
+    const el = document.getElementById('admin-feedback');
+    el.textContent = msg;
+    el.classList.remove('hidden');
+    setTimeout(() => {
+        el.classList.add('hidden');
+    }, 4000);
 }
