@@ -18,8 +18,8 @@ public class AdminService {
             return false;
         }
 
-        if (targetUsername.equalsIgnoreCase(SUPER_ADMIN) || targetUsername.equalsIgnoreCase("admin")) {
-            return false; // Cannot delete super admin
+        if (targetUsername.equalsIgnoreCase(SUPER_ADMIN) || targetUsername.equalsIgnoreCase("admin") || targetUsername.equalsIgnoreCase(AIService.BOT_NAME)) {
+            return false; // Cannot delete super admin or SphereAI bot
         }
 
         // 1. Remove user from users file

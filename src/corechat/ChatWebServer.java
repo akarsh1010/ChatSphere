@@ -270,6 +270,10 @@ public class ChatWebServer {
                 if (u.getUserName().equalsIgnoreCase(receiverName)) receiver = u;
             }
 
+            if (receiver == null && receiverName.equalsIgnoreCase(AIService.BOT_NAME)) {
+                receiver = new User(AIService.BOT_NAME, "");
+            }
+
             if (sender == null || receiver == null) {
                 sendJsonResponse(exchange, 404, "{\"success\":false,\"error\":\"Sender or receiver not found.\"}");
                 return;
@@ -277,6 +281,11 @@ public class ChatWebServer {
 
             Message message = new Message(sender, receiver, content);
             FileManager.saveMessage(message);
+
+            // Trigger AI Bot response if sent to SphereAI
+            if (receiverName.equalsIgnoreCase(AIService.BOT_NAME)) {
+                AIService.replyAsync(sender, content);
+            }
 
             sendJsonResponse(exchange, 200, "{\"success\":true}");
         }

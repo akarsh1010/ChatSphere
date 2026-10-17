@@ -1,0 +1,3 @@
+alokrana,100
+alok,100
+SphereAI,bot

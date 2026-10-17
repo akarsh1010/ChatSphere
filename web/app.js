@@ -225,16 +225,36 @@ function renderUsersList(users) {
     const listContainer = document.getElementById('users-list');
     listContainer.innerHTML = '';
 
-    if (users.length === 0) {
-        listContainer.innerHTML = `
-            <div style="padding: 28px 16px; text-align: center; color: var(--text-dim); font-size: 13px; line-height: 1.5;">
-                No other users found.<br>Open an incognito tab to register another friend!
+    // Pinned @SphereAI Assistant
+    const botItem = document.createElement('div');
+    botItem.className = `user-card-item ai-bot-card ${activeChatUser === 'SphereAI' ? 'active' : ''}`;
+    botItem.onclick = () => selectUser('SphereAI');
+    botItem.innerHTML = `
+        <div class="avatar ai-avatar" style="width: 40px; height: 40px; font-size: 18px; flex-shrink: 0; background: linear-gradient(135deg, #8b5cf6, #3b82f6); box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);">🤖</div>
+        <div class="user-card-meta">
+            <div class="user-row-top">
+                <span class="user-item-username" style="color: #c4b5fd; font-weight: 800;">@SphereAI <span class="ai-badge">AI BOT</span></span>
+                <span class="user-item-timestamp" style="color: #a78bfa;">24/7</span>
             </div>
-        `;
+            <div class="user-row-bottom">
+                <span class="user-item-snippet" style="color: #a78bfa;">⚡ Instant answers & Java help</span>
+            </div>
+        </div>
+    `;
+    listContainer.appendChild(botItem);
+
+    // Filter out duplicate bot from regular users list
+    const realUsers = users.filter(u => u.username.toLowerCase() !== 'sphereai');
+
+    if (realUsers.length === 0) {
+        const emptyNotice = document.createElement('div');
+        emptyNotice.style.cssText = 'padding: 22px 16px; text-align: center; color: var(--text-dim); font-size: 12.5px; line-height: 1.5;';
+        emptyNotice.innerHTML = 'No other friends online.<br>Chat with <b>@SphereAI</b> above or invite friends!';
+        listContainer.appendChild(emptyNotice);
         return;
     }
 
-    users.forEach(user => {
+    realUsers.forEach(user => {
         const item = document.createElement('div');
         item.className = `user-card-item ${activeChatUser === user.username ? 'active' : ''}`;
         item.onclick = () => selectUser(user.username);
@@ -276,10 +296,18 @@ function selectUser(username) {
     document.getElementById('no-chat-selected').classList.add('hidden');
     document.getElementById('active-chat-wrapper').classList.remove('hidden');
 
-    document.getElementById('active-chat-username').textContent = '@' + username;
     const chatAvatar = document.getElementById('active-chat-avatar');
-    chatAvatar.textContent = username.charAt(0).toUpperCase();
-    chatAvatar.style.background = getAvatarGradient(username);
+    if (username === 'SphereAI') {
+        document.getElementById('active-chat-username').innerHTML = '@SphereAI <span class="ai-badge">AI BOT</span>';
+        chatAvatar.textContent = '🤖';
+        chatAvatar.style.background = 'linear-gradient(135deg, #8b5cf6, #3b82f6)';
+        chatAvatar.style.boxShadow = '0 0 15px rgba(139, 92, 246, 0.4)';
+    } else {
+        document.getElementById('active-chat-username').textContent = '@' + username;
+        chatAvatar.textContent = username.charAt(0).toUpperCase();
+        chatAvatar.style.background = getAvatarGradient(username);
+        chatAvatar.style.boxShadow = 'none';
+    }
 
     renderUsersList(allUsers);
 

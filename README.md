@@ -30,6 +30,7 @@ CoreChat evolved from a terminal-based CLI application to a containerized full-s
 | **Timestamps** | None | Formatted 12-hour timestamps (`hh:mm a`) |
 | **Notifications** | Console print outputs | Web Audio API synthesize chime sounds |
 | **Admin Controls** | ❌ None | 👑 Super Admin Dashboard (`@alokrana`) |
+| **AI Assistant** | ❌ None | 🤖 Native `@SphereAI` Bot (Gemini API + Smart Engine) |
 | **Cloud Deployment** | Local execution only | 🐳 Dockerfile + Cloud dynamic `$PORT` (Render) |
 
 ---
@@ -55,6 +56,7 @@ A major overhaul transforming CoreChat into a complete, modern web chat platform
   - **Live Platform Stats**: Total registered users, total messages exchanged, and server health.
   - **1-Click User Kick/Ban**: Permanently remove offending users and purge their message history.
   - **Official Admin Notices**: Dispatch administrative warning alerts directly into any user's conversation.
+- **🤖 Native AI Assistant (`@SphereAI`)**: 24/7 intelligent conversational partner pinned to every user's chat list. Dual-mode architecture seamlessly connects to Google Gemini Cloud API when `GEMINI_API_KEY` is present, while falling back to a built-in Core Java NLP engine for Java/OOP guidance, jokes, and assistance without external dependencies.
 - **🐳 Cloud & Container Ready**: Includes a production-ready `Dockerfile` (OpenJDK 17) configured for 1-click cloud deployment on **Render**, **Railway**, or **Fly.io** using dynamic `$PORT` binding.
 
 ---
@@ -70,6 +72,7 @@ CoreChat/
 │   └── messages.txt             # Persisted messages (sender,receiver,content,timestamp)
 ├── src/
 │   └── corechat/
+│       ├── AIService.java       # 🤖 Native AI Assistant & Gemini Cloud integration
 │       ├── AdminService.java    # 👑 Super Admin logic & moderation controls
 │       ├── ChatWebServer.java   # 🌐 Zero-dependency Web Server & REST API router
 │       ├── ChatApplication.java # 📟 v1.0 Console/CLI entry point
