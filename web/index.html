@@ -118,6 +118,9 @@
                         <span class="user-title" id="current-user-name">Loading...</span>
                         <span class="user-badge-online">Online & Active</span>
                     </div>
+                    <button class="action-icon-btn admin-btn hidden" id="admin-panel-btn" onclick="openAdminModal()" title="Admin Control Dashboard">
+                        👑
+                    </button>
                     <button class="action-icon-btn logout-trigger" onclick="logout()" title="Logout from session">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
@@ -217,6 +220,50 @@
                     </div>
                 </div>
             </main>
+        </div>
+    </div>
+
+    <!-- ================= ADMIN DASHBOARD MODAL ================= -->
+    <div id="admin-modal" class="modal-backdrop hidden" onclick="handleModalBackdropClick(event)">
+        <div class="admin-modal-card glass-morphism">
+            <div class="modal-topbar">
+                <div class="modal-title-group">
+                    <span class="admin-crown-icon">👑</span>
+                    <div>
+                        <h3>Super Admin Console</h3>
+                        <span class="admin-subtitle">Live Moderation & User Management</span>
+                    </div>
+                </div>
+                <button class="modal-close-btn" onclick="closeAdminModal()">✕</button>
+            </div>
+
+            <!-- Live Stats Row -->
+            <div class="admin-stats-row">
+                <div class="stat-pill-card">
+                    <span class="stat-val" id="stat-total-users">0</span>
+                    <span class="stat-name">Registered Users</span>
+                </div>
+                <div class="stat-pill-card">
+                    <span class="stat-val" id="stat-total-messages">0</span>
+                    <span class="stat-name">Messages Exchanged</span>
+                </div>
+                <div class="stat-pill-card">
+                    <span class="stat-val status-ok">Optimal</span>
+                    <span class="stat-name">Server Health</span>
+                </div>
+            </div>
+
+            <!-- User Management Table -->
+            <div class="admin-management-section">
+                <div class="section-subheading">
+                    <h4>User Management</h4>
+                    <span id="admin-feedback" class="admin-feedback-msg hidden"></span>
+                </div>
+
+                <div class="admin-users-scroll" id="admin-users-table">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
         </div>
     </div>
 
