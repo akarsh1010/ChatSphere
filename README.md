@@ -1,158 +1,114 @@
-# 💬 CoreChat (v1.0)
+# 💬 CoreChat (ChatSphere)
 
-> A robust, console-based 1-on-1 chat application built with **Core Java**, clean **Object-Oriented Programming (OOP)** design, and persistent **File I/O** storage.
+> A lightweight, full-stack real-time 1-on-1 chat platform built in pure **Core Java (Java SE)** without external frameworks, featuring persistent **File I/O**, a modern **Glassmorphic Web Interface**, and a dedicated **Super Admin Moderation Console**.
 
 [![Java](https://img.shields.io/badge/Language-Java%2017%2B-orange.svg)](https://www.oracle.com/java/)
-[![Architecture](https://img.shields.io/badge/Architecture-OOP%20%7C%20MVC--inspired-blue.svg)]()
-[![Status](https://img.shields.io/badge/Status-v1.0%20(Stable)-success.svg)]()
-[![License](https://img.shields.io/badge/License-MIT-green.svg)]()
+[![Version](https://img.shields.io/badge/Version-v2.0%20(Latest)-blue.svg)]()
+[![Server](https://img.shields.io/badge/Server-Zero--Dependency%20HttpServer-teal.svg)]()
+[![Frontend](https://img.shields.io/badge/Frontend-Vanilla%20JS%20%7C%20HTML5%20%7C%20CSS3-yellow.svg)]()
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 ---
 
-## 📌 Overview
+## 🚀 Version Evolution: v1.0 vs v2.0
 
-**CoreChat** is a terminal-based messaging platform designed to simulate a real-world chat system. Unlike basic command-line prototypes that lose data upon termination, CoreChat features a custom **File I/O Persistence Engine** that safely stores users and conversation histories across sessions.
+CoreChat evolved from a terminal-based CLI application to a containerized full-stack web messenger with complete moderation powers.
+
+| Feature Category | 📟 v1.0 (Console Edition) | 🌐 v2.0 (Web & Admin Edition) |
+| :--- | :--- | :--- |
+| **Interface** | Terminal / Command Line Interface | Modern responsive Web App (Glassmorphism) |
+| **Architecture** | CLI Menu Loop + OOP Services | Built-in Java SE `HttpServer` + REST APIs |
+| **Dependencies** | Pure Java Standard Library | 100% Zero Frameworks (No Spring Boot / Maven) |
+| **Persistence** | File I/O (`users.txt`, `messages.txt`) | File I/O + Atomic Batch Overwrite Operations |
+| **Timestamps** | None | Formatted 12-hour timestamps (`hh:mm a`) |
+| **Notifications** | Console print outputs | Web Audio API synthesize chime sounds |
+| **Admin Controls** | ❌ None | 👑 Super Admin Dashboard (`@alokrana`) |
+| **Cloud Deployment** | Local execution only | 🐳 Dockerfile + Cloud dynamic `$PORT` (Render) |
 
 ---
 
-## ✨ Key Features
+### 📟 v1.0 — CLI / Terminal Edition
+The foundational release focusing on pure Core Java concepts, clean Object-Oriented design, and basic persistence:
+- **Terminal User Flow**: Interactive menu-driven navigation (Register, Login, Chat, Exit).
+- **Authentication**: Case-insensitive usernames and password validation.
+- **Continuous Chat Loop**: Seamless messaging loop without exiting after every message.
+- **File I/O Persistence**: Safe user and message storage in `data/users.txt` and `data/messages.txt`.
+- **Input Crash Protection**: Protected against invalid inputs using `InputMismatchException` handlers.
 
-- **🔐 User Authentication & Validation**
-  - Registration with duplicate username prevention.
-  - Case-insensitive username lookup with password verification.
+---
 
-- **💬 Real-Time Continuous Chat Loop**
-  - Interactive chat session between users (no need to repeatedly re-select chat partners after every message).
-  - Clean chatroom interface with commands to exit/return (`exit`, `back`).
-
-- **📜 Persistent Chat History**
-  - Seamlessly reloads previous messages between two users upon opening their chat.
-  - Automatically identifies whether a user is the sender or receiver.
-
-- **💾 File-Based Persistence (File I/O)**
-  - Stores credentials and messages permanently under the `data/` directory (`users.txt` and `messages.txt`).
-  - No database required; uses standard Java I/O streams (`BufferedReader`, `BufferedWriter`).
-
-- **🛡️ Exception & Error Resilience**
-  - Built-in crash protection against non-numeric menu inputs (`InputMismatchException`).
-  - Empty messages and whitespace-only inputs are safely ignored.
+### 🌐 v2.0 — Full-Stack Web & Super Admin Edition *(Current)*
+A major overhaul transforming CoreChat into a complete, modern web chat platform:
+- **Zero-Dependency Web Server**: Built using native `com.sun.net.httpserver.HttpServer`. Serves static web assets and handles REST API endpoints (`/api/register`, `/api/login`, `/api/users`, `/api/messages`, `/api/send`, `/api/admin`).
+- **Modern Glassmorphism UI**: Royal blue & midnight slate aesthetic, auto-generated user avatars, password visibility eye toggle, and double-tick (`✓✓`) read receipts.
+- **Live Polling & Web Audio Chimes**: Auto-refreshes conversations every 1.5 seconds and plays pleasant Web Audio synthesized notification chimes upon receiving new messages.
+- **Timestamp Engine**: Every message records accurate send times (`hh:mm a`) via Java 8 `LocalTime` and `DateTimeFormatter`.
+- **👑 Super Admin Moderation Console**:
+  - Exclusive access for **`@alokrana`** with protected status (cannot be banned).
+  - **Live Platform Stats**: Total registered users, total messages exchanged, and server health.
+  - **1-Click User Kick/Ban**: Permanently remove offending users and purge their message history.
+  - **Official Admin Notices**: Dispatch administrative warning alerts directly into any user's conversation.
+- **🐳 Cloud & Container Ready**: Includes a production-ready `Dockerfile` (OpenJDK 17) configured for 1-click cloud deployment on **Render**, **Railway**, or **Fly.io** using dynamic `$PORT` binding.
 
 ---
 
 ## 🏗️ Project Architecture
 
-```
+```text
 CoreChat/
+├── Dockerfile                   # Cloud container configuration (Render / Docker)
+├── README.md                    # Project documentation & evolution guide
 ├── data/
 │   ├── users.txt                # Persisted user records (username,password)
-│   └── messages.txt             # Persisted messages (sender,receiver,content)
+│   └── messages.txt             # Persisted messages (sender,receiver,content,timestamp)
 ├── src/
 │   └── corechat/
-│       ├── ChatApplication.java # Console edition entry point (CLI router & menus)
-│       ├── ChatWebServer.java   # 🌐 Web edition server (built-in Java HttpServer & REST APIs)
-│       ├── ChatService.java     # Console continuous chat session loop
-│       ├── FileManager.java     # File I/O persistence manager (read/write operations)
-│       ├── MessageManager.java  # In-memory message management & aggregation
-│       ├── Message.java         # Domain entity representing a single chat message
-│       └── User.java            # Domain entity representing an authenticated user
-├── web/                         # 🌐 Frontend web assets
-│   ├── index.html               # Modern responsive web layout (Login/Register & Chat views)
-│   ├── style.css                # Dark-mode styling, responsive bubbles, custom scrollbars
-│   └── app.js                   # Vanilla JS client (Fetch API, live auto-polling)
-├── README.md
-└── CoreChat.iml
+│       ├── AdminService.java    # 👑 Super Admin logic & moderation controls
+│       ├── ChatWebServer.java   # 🌐 Zero-dependency Web Server & REST API router
+│       ├── ChatApplication.java # 📟 v1.0 Console/CLI entry point
+│       ├── ChatService.java     # v1.0 Console chat loop service
+│       ├── FileManager.java     # File I/O persistence engine (read, write, overwrite)
+│       ├── MessageManager.java  # In-memory message collection manager
+│       ├── Message.java         # Message entity with timestamp support
+│       └── User.java            # User domain model
+└── web/
+    ├── index.html               # Semantic HTML5 layout (Auth, Chat View, Admin Modal)
+    ├── style.css                # Royal blue & slate glassmorphism styling
+    └── app.js                   # Vanilla JS client (Polling, Audio chimes, Admin logic)
 ```
-
-### Class Responsibilities:
-- **`ChatWebServer`**: Zero-dependency Web Server serving the frontend assets and REST APIs (`/api/login`, `/api/register`, `/api/users`, `/api/messages`, `/api/send`).
-- **`ChatApplication`**: Console/CLI entry point coordinating terminal menus and user interactions.
-- **`ChatService`**: Orchestrates active console chat sessions and drives the continuous messaging loop.
-- **`FileManager`**: Decoupled persistence layer handling serialization and parsing of data files.
-- **`MessageManager`**: Acts as an in-memory repository managing the active message list.
-- **`User` & `Message`**: Encapsulated domain models with appropriate accessors and equality contracts.
 
 ---
 
-## 🚀 Getting Started
+## 🚀 How to Run
 
 ### Prerequisites
-- **Java Development Kit (JDK)**: Version 17 or higher recommended.
-- **IDE**: IntelliJ IDEA, Eclipse, VS Code, or command-line terminal.
+- **Java Development Kit (JDK)**: Version 17 or higher.
 
-### 📥 Installation & Running
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/alok0770/ChatSphere.git
-   cd CoreChat
-   ```
-
-2. **Compile the source files:**
-   ```bash
-   javac -d out/production/CoreChat src/corechat/*.java
-   ```
-
-3. **Run the Application:**
-
-   - **Option A — Web Edition (Browser):**
-     ```bash
-     java -cp out/production/CoreChat corechat.ChatWebServer
-     ```
-     👉 Then open `http://localhost:8080` in your web browser!
-
-   - **Option B — Console Edition (Terminal):**
-     ```bash
-     java -cp out/production/CoreChat corechat.ChatApplication
-     ```
-
-*(Alternatively, open the project in **IntelliJ IDEA** and right-click **Run** on either `ChatWebServer.java` or `ChatApplication.java`.)*
-
----
-
-## 🖥️ Usage Demonstration
-
-### 1. Main Menu
-```text
-==========================
-        CORE CHAT         
-==========================
-
-Welcome to CoreChat!
-Starting Application...
-
----------Menu---------
-1. Register 
-2. Login 
-3. Exit
-
-Enter your choice : 1
+### 📥 1. Clone & Compile
+```bash
+git clone https://github.com/alok0770/ChatSphere.git
+cd CoreChat
+javac -d out/production/CoreChat src/corechat/*.java
 ```
 
-### 2. Live Chat Session
-```text
-========================================
- Chatting with @rahul
- (Type 'exit' or 'back' to leave chat)  
-========================================
-rahul : Hey! How is the CoreChat project going?
-alok : It's going great! Just integrated File I/O persistence.
-----------------------------------------
-alok > Working on v1.0 right now!
-alok > exit
+### 🌐 2. Run v2.0 Web Edition (Recommended)
+```bash
+java -cp out/production/CoreChat corechat.ChatWebServer
+```
+👉 Open your browser at **`http://localhost:8080`**!
 
-Left chat with @rahul.
+> **Super Admin Login**: Log in with username **`alokrana`** (password: `100`) to unlock the **👑 Crown Button** and access the Super Admin Console.
+
+### 📟 3. Run v1.0 Console Edition (Terminal)
+```bash
+java -cp out/production/CoreChat corechat.ChatApplication
 ```
 
----
-
-## 🗺️ Roadmap & Changelog
-
-- [x] **Message Timestamps**: Accurate time logging (`11:45 PM`) stored in `messages.txt`.
-- [x] **Web Edition UI**: Full-stack modern responsive web messenger with live polling.
-- [x] **Zero-Dependency HTTP Server**: Built-in Java SE `HttpServer` with REST APIs.
-- [x] **Cloud Containerization**: 1-click Dockerfile for instant deployment on Render.
-- [ ] **Socket Programming**: WebSockets for push-based real-time communication.
-- [ ] **Group Chats**: Multi-user rooms and channel broadcasting.
+### 🐳 4. Run via Docker
+```bash
+docker build -t corechat .
+docker run -p 8080:8080 corechat
+```
 
 ---
 
@@ -161,9 +117,10 @@ Left chat with @rahul.
 **Alok Rana**
 - **GitHub:** [@alok0770](https://github.com/alok0770)
 - **Email:** [alokrana0770@gmail.com](mailto:alokrana0770@gmail.com)
+- **Project Repo:** [ChatSphere](https://github.com/alok0770/ChatSphere)
 
 ---
 
 ## 📄 License
 
-This project is open-source and available under the [MIT License](LICENSE).
+This project is licensed under the [MIT License](LICENSE).
