@@ -423,7 +423,48 @@ function renderMessages(messages) {
         container.appendChild(bubble);
     });
 
+    // If in chat with SphereAI and the latest message was sent by currentUser, show typing indicator
+    if (activeChatUser === 'SphereAI' && messages.length > 0) {
+        const lastMsg = messages[messages.length - 1];
+        if (lastMsg.sender.toLowerCase() === currentUser.toLowerCase()) {
+            appendAiTypingIndicator(container);
+        }
+    }
+
     container.scrollTop = container.scrollHeight;
+}
+
+let fastAiPollingTimer = null;
+
+function appendAiTypingIndicator(container) {
+    if (document.getElementById('ai-typing-indicator')) return;
+    const row = document.createElement('div');
+    row.id = 'ai-typing-indicator';
+    row.className = 'message-bubble received ai-typing-bubble';
+    row.innerHTML = `
+        <div class="bubble-sender" style="color: #a78bfa; font-size: 11px;">@SphereAI</div>
+        <div class="typing-dots-wrap">
+            <span class="typing-dot"></span>
+            <span class="typing-dot"></span>
+            <span class="typing-dot"></span>
+            <span class="typing-text">thinking...</span>
+        </div>
+    `;
+    container.appendChild(row);
+}
+
+function triggerFastAiPolling() {
+    if (fastAiPollingTimer) clearInterval(fastAiPollingTimer);
+    let polls = 0;
+    fastAiPollingTimer = setInterval(async () => {
+        polls++;
+        await loadMessages();
+        // If reply arrived (indicator removed) or 15 polls reached (6 seconds), stop fast polling
+        if (!document.getElementById('ai-typing-indicator') || polls >= 15) {
+            clearInterval(fastAiPollingTimer);
+            fastAiPollingTimer = null;
+        }
+    }, 400); // 400ms ultra-fast poll!
 }
 
 async function handleSendMessage(event) {
@@ -450,7 +491,15 @@ async function handleSendMessage(event) {
         });
 
         if (res.ok) {
-            loadMessages();
+            await loadMessages();
+            if (activeChatUser === 'SphereAI') {
+                const container = document.getElementById('messages-container');
+                if (container) {
+                    appendAiTypingIndicator(container);
+                    container.scrollTop = container.scrollHeight;
+                }
+                triggerFastAiPolling();
+            }
         }
     } catch (err) {
         console.error('Error sending message:', err);

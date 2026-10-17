@@ -28,9 +28,6 @@ public class AIService {
     public static void replyAsync(User recipientUser, String userPrompt) {
         CompletableFuture.runAsync(() -> {
             try {
-                // Natural typing delay (600ms)
-                Thread.sleep(600);
-
                 String reply = generateResponse(userPrompt, recipientUser.getUserName());
                 User botUser = new User(BOT_NAME, "");
                 Message botMessage = new Message(botUser, recipientUser, reply);
@@ -65,22 +62,27 @@ public class AIService {
     }
 
     private static String callGeminiApi(String prompt, String apiKey) throws IOException, InterruptedException {
-        String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=" + apiKey;
+        String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent?key=" + apiKey;
 
         String safePrompt = prompt.replace("\\", "\\\\")
                 .replace("\"", "\\\"")
                 .replace("\n", " ")
                 .replace("\r", "");
 
+        String systemPersona = "You are SphereAI, the ultra-fast AI assistant embedded inside ChatSphere. "
+                + "About the Creator: ChatSphere was engineered by Alok Rana (@alok0770), a passionate Java Developer and 3rd-year BCA college student. "
+                + "Alok's email: alokrana0770@gmail.com, GitHub: https://github.com/alok0770/ChatSphere. "
+                + "Alok's technical skills: Core Java, Java 8 (Streams, Lambdas), JDBC, Maven, Docker, Spring Boot, REST APIs, HTML/CSS/JS, DBMS/SQL, HTTPS protocols, custom HttpServer architecture, computer networking, OS, and compiler/JVM fundamentals. "
+                + "ChatSphere is built in 100% pure Core Java SE without external frameworks. "
+                + "Keep your answers fast, concise, helpful, well-formatted, and direct for chat bubbles. User question: ";
+
         String jsonPayload = "{\"contents\":[{\"parts\":[{\"text\":\""
-                + "You are SphereAI, the intelligent assistant inside ChatSphere (a chat app built by Alok Rana using Core Java). "
-                + "Keep answers clear, helpful, well-formatted, and concise for chat bubbles. User question: "
-                + safePrompt + "\"}]}]}";
+                + systemPersona + safePrompt + "\"}]}]}";
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .header("Content-Type", "application/json")
-                .timeout(Duration.ofSeconds(15))
+                .timeout(Duration.ofSeconds(12))
                 .POST(HttpRequest.BodyPublishers.ofString(jsonPayload, StandardCharsets.UTF_8))
                 .build();
 
@@ -149,8 +151,12 @@ public class AIService {
 
         // 2. Creator & Platform Info
         if (lower.contains("who made") || lower.contains("who created") || lower.contains("kisme banaya")
-                || lower.contains("creator") || lower.contains("developer") || lower.contains("author")) {
-            return "ChatSphere & CoreChat was engineered by Alok Rana (@alok0770) using pure Core Java (Java SE) with zero external frameworks! 🚀";
+                || lower.contains("creator") || lower.contains("developer") || lower.contains("author")
+                || lower.contains("alok rana") || lower.contains("alok") || lower.contains("skills")) {
+            return "👨‍💻 ChatSphere was created & engineered by Alok Rana (@alok0770)!\n\n"
+                    + "🎓 Background: 3rd-year BCA college student & dedicated Java Developer.\n"
+                    + "🛠️ Skills: Core Java, Java 8 (Streams & Lambdas), Spring Boot, JDBC, Maven, Docker, REST APIs, HTML/CSS/JS, DBMS, HTTPS protocols, server architecture, networking, OS, and compiler fundamentals.\n"
+                    + "📬 Email: alokrana0770@gmail.com | GitHub: github.com/alok0770/ChatSphere";
         }
 
         if (lower.contains("who are you") || lower.contains("tum kon ho") || lower.contains("what are you")) {
