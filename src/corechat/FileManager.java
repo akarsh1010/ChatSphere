@@ -79,9 +79,9 @@ public class FileManager {
                     User sender = findUser(users, senderName);
                     User receiver = findUser(users, receiverName);
 
-                    if (sender != null && receiver != null) {
-                        messages.add(new Message(sender, receiver, content, timestamp));
-                    }
+                    if (sender == null) sender = new User(senderName, "");
+                    if (receiver == null) receiver = new User(receiverName, "");
+                    messages.add(new Message(sender, receiver, content, timestamp));
                 }
             }
         } catch (IOException e) {
@@ -99,6 +99,31 @@ public class FileManager {
             writer.newLine();
         } catch (IOException e) {
             System.out.println("-> Error saving message to file: " + e.getMessage());
+        }
+    }
+
+    public static void overwriteUsers(ArrayList<User> users) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(USERS_FILE, false))) {
+            for (User u : users) {
+                writer.write(u.getUserName() + "," + u.getPassword());
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            System.out.println("-> Error rewriting users file: " + e.getMessage());
+        }
+    }
+
+    public static void overwriteMessages(ArrayList<Message> messages) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(MESSAGES_FILE, false))) {
+            for (Message m : messages) {
+                writer.write(m.getSender().getUserName() + ","
+                        + m.getReceiver().getUserName() + ","
+                        + m.getMessage() + ","
+                        + m.getTimestamp());
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            System.out.println("-> Error rewriting messages file: " + e.getMessage());
         }
     }
 
