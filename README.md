@@ -2,11 +2,18 @@
 
 > A lightweight, full-stack real-time 1-on-1 chat platform built in pure **Core Java (Java SE)** without external frameworks, featuring persistent **File I/O**, a modern **Glassmorphic Web Interface**, and a dedicated **Super Admin Moderation Console**.
 
+[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Launch_ChatSphere-success?style=for-the-badge&logo=render&logoColor=white)](https://chatsphere-d261.onrender.com)
+[![GitHub stars](https://img.shields.io/github/stars/alok0770/ChatSphere?style=for-the-badge&color=ffd700)](https://github.com/alok0770/ChatSphere)
+
 [![Java](https://img.shields.io/badge/Language-Java%2017%2B-orange.svg)](https://www.oracle.com/java/)
 [![Version](https://img.shields.io/badge/Version-v2.0%20(Latest)-blue.svg)]()
 [![Server](https://img.shields.io/badge/Server-Zero--Dependency%20HttpServer-teal.svg)]()
 [![Frontend](https://img.shields.io/badge/Frontend-Vanilla%20JS%20%7C%20HTML5%20%7C%20CSS3-yellow.svg)]()
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
+> [!TIP]
+> 🌐 **Try it Live in your Browser:** **[https://chatsphere-d261.onrender.com](https://chatsphere-d261.onrender.com)**  
+> *No local installation required! Works seamlessly across Desktop and Mobile devices with full audio chimes and real-time chat.*
 
 ---
 
@@ -92,10 +99,13 @@ javac -d out/production/CoreChat src/corechat/*.java
 ```
 
 ### 🌐 2. Run v2.0 Web Edition (Recommended)
-```bash
-java -cp out/production/CoreChat corechat.ChatWebServer
-```
-👉 Open your browser at **`http://localhost:8080`**!
+
+- **🚀 Live Cloud Demo**: Open directly at **[https://chatsphere-d261.onrender.com](https://chatsphere-d261.onrender.com)** (No local setup required!)
+- **💻 Or Run Locally on Machine**:
+  ```bash
+  java -cp out/production/CoreChat corechat.ChatWebServer
+  ```
+  👉 Open your browser at **`http://localhost:8080`**!
 
 > **Super Admin Login**: Log in with username **`alokrana`** (password: `100`) to unlock the **👑 Crown Button** and access the Super Admin Console.
 
